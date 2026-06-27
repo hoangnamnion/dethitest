@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ôn Tập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="mesh-bg">
+        <div class="mesh-blob blob-1"></div>
+        <div class="mesh-blob blob-2"></div>
+        <div class="mesh-blob blob-3"></div>
+    </div>
+    <div class="app-full">
+        <div class="toolbar">
+            <button onclick="goBack()" class="home-btn"><img src="img/muiten.jpg" class="logo-img"></button>
+            <div style="font-weight:bold" id="titleBar">Đang tải...</div>
+            <button class="toggle-btn" id="btnToggle" onclick="toggleAnswers()">👁️ Che Đáp Án</button>
+        </div>
+        <div class="content" id="listContent"></div>
+    </div>
+
+    <script src="js/review.js"></script>
+    <script>
+        // KIỂM TRA ĐĂNG NHẬP
+        const userData = sessionStorage.getItem('current_user');
+        if (!userData) {
+            window.location.href = "login.html";
+        }
+
+        const p = new URLSearchParams(window.location.search);
+        const fid = p.get('id');
+        if(fid) { loadReview(fid); }
+        function goBack() { window.location.href = `product.html?id=${fid}`; }
+    </script>
+    <script src="js/tkhethan.js"></script>
+    <script src="js/tet.js"></script>
+    <script src="js/no-refresh.js"></script>
+</body>
+</html>
