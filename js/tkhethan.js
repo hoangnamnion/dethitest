@@ -98,14 +98,10 @@ function startOnlineTracking(username) {
         fetch(`${API_BASE}?action=pingOnline&username=${encodedName}&deviceId=${encodeURIComponent(deviceId)}`)
             .then(res => res.json())
             .then(data => {
-                // Kiểm tra nếu bị kick vì đăng nhập nơi khác
+                // Kiểm tra nếu bị kick vì đăng nhập nhiều nơi
                 if (data.valid === false && data.action === 'logout') {
-                    // Bỏ qua nếu mới login dưới 10 giây (bảo vệ thiết bị mới khỏi KV cache cũ của server)
-                    if (Date.now() - loginTime < 10000) {
-                        return;
-                    }
                     sessionStorage.removeItem('current_user');
-                    alert(data.message || 'Tài khoản đang được đăng nhập ở thiết bị khác! Bạn đã bị đăng xuất.');
+                    alert(data.message || 'Phát hiện tài khoản đăng nhập trên nhiều thiết bị cùng lúc! Bạn đã bị đăng xuất.');
                     window.location.href = "login.html";
                 }
             })
