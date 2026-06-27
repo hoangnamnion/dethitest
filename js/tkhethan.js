@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==========================================
 // ONLINE TRACKING & SINGLE DEVICE CHECK (CLOUDFLARE WORKER)
-// Ping mỗi 10 giây — offline nếu lệch > 3 phút
+// Ping mỗi 3 giây — offline nếu lệch > 3 phút
 // ==========================================
 function startOnlineTracking(username) {
     if (typeof API_BASE === 'undefined') {
@@ -86,24 +86,22 @@ function startOnlineTracking(username) {
 
     const encodedName = encodeURIComponent(username);
     
-    // Lấy deviceId và thời gian login từ session (đã lưu lúc login)
+    // Lấy deviceId từ session (đã lưu lúc login)
     let deviceId = "";
-    let loginTime = 0;
     try {
         const userData = JSON.parse(sessionStorage.getItem('current_user') || '{}');
         deviceId = userData.deviceId || "";
-        loginTime = new Date(userData.loginTime).getTime() || 0;
     } catch(e) {}
 
     // Hàm gửi ping
     const sendPing = () => {
-        fetch(`${API_BASE}?action=pingOnline&username=${encodedName}&deviceId=${encodeURIComponent(deviceId)}&t=${Date.now()}`)
+        fetch(`${API_BASE}?action=pingOnline&username=${encodedName}&deviceId=${encodeURIComponent(deviceId)}`)
             .then(res => res.json())
             .then(data => {
                 // Kiểm tra nếu bị kick vì đăng nhập nơi khác
                 if (data.valid === false && data.action === 'logout') {
-                    // Bỏ qua nếu mới login dưới 60 giây (bảo vệ thiết bị mới khỏi KV cache cũ của server)
-                    if (Date.now() - loginTime < 60000) {
+                    // Bỏ qua nếu mới login dưới 10 giây (bảo vệ thiết bị mới khỏi KV cache cũ của server)
+                    if (Date.now() - loginTime < 10000) {
                         return;
                     }
                     sessionStorage.removeItem('current_user');
@@ -124,8 +122,8 @@ function startOnlineTracking(username) {
     // 1. Ping ngay lập tức khi mở trang
     sendPing();
 
-    // 2. Ping lặp lại mỗi 10 giây
-    setInterval(sendPing, 10000);
+    // 2. Ping lặp lại mỗi 3 giây để phát hiện nhanh đăng nhập nơi khác
+    setInterval(sendPing, 3000);
 
     // 3. Offline khi đóng tab/trình duyệt
     window.addEventListener('beforeunload', () => {
